@@ -51,18 +51,22 @@ class TestEstructurasDeDatos(unittest.TestCase):
 
 		primero=q.popleft()
 		self.assertEqual(primero,6)
-
+		#La lista solo tiene el valor 2
 		self.assertEqual(q,deque([2],maxlen=3))
 
 	def test_buscar_el_mayor_y_menor_valor_de_una_lista(self):
 		import heapq
 		nums = [1, 8, 2, 23, 7, -4, 18, 23, 42, 37, 2]
 
-		self.assertEqual(heapq.nlargest(3,nums),[42,37,23])
-		self.assertEqual(heapq.nsmallest(3,nums),[-4,1,2])
+		tres_mayores = heapq.nlargest(3,nums) 
+		self.assertEqual(tres_mayores,[42,37,23])
+		tres_menores = heapq.nsmallest(3,nums)
+		self.assertEqual(tres_menores,[-4,1,2])
 
-		self.assertEqual(max(nums),42)
-		self.assertEqual(min(nums),-4)
+		mayor = max(nums)
+		menor = min(nums)
+		self.assertEqual(mayor ,42)
+		self.assertEqual(menor ,-4)
 
 		heap = list(nums)
 		#Pone el primer elemento en la posicion 0
@@ -87,26 +91,31 @@ class TestEstructurasDeDatos(unittest.TestCase):
 			{'articulo': 'ACME',  'precio': 115.65}
 		]
 		
-		cheap = heapq.nsmallest(2, portfolio, key=lambda s: s['precio'])
-		expensive = heapq.nlargest(1, portfolio, key=lambda s: s['precio'])
-		self.assertEqual(cheap,[{'articulo': 'YHOO',  'precio': 16.35},{'articulo': 'FB',  'precio': 21.09}])
-		self.assertEqual(expensive,[{'articulo': 'AAPL',  'precio': 543.22}])
+
+		dos_mas_baratos = heapq.nsmallest(2, portfolio, key=lambda s: s['precio'])
+		el_mas_caro = heapq.nlargest(1, portfolio, key=lambda s: s['precio'])
+		self.assertEqual(dos_mas_baratos,[{'articulo': 'YHOO',  'precio': 16.35},{'articulo': 'FB',  'precio': 21.09}])
+		self.assertEqual(el_mas_caro,[{'articulo': 'AAPL',  'precio': 543.22}])
 
 		from operator import itemgetter
 		menor = min(portfolio, key=itemgetter('precio'))
 		self.assertEqual(menor,{'articulo': 'YHOO',  'precio': 16.35})
 
 	def test_prioridad_en_las_colas_queue(self):
-		from DataStructures import Item
+		from MisClases import Item
 		a = (1,Item('foo'))
 		b = (5,Item('bar'))
-		c = (1,Item('grook'))		
+		c = (1,Item('grook'))	
+
+		#Cuando se compara una tupla, se compara el primer elemento	
 		self.assertTrue(a<b)	
 		
+		#Si los primero valores son iguales, compara el segundo
+		#El segundo valor en este caso es una clase, por eso marca error la comparacion
 		with self.assertRaises(TypeError) as context:
 			a<c
 
-			# Usamos un indice extra
+	    # Usamos un indice extra cuando el primer valor es igual
 		a = (1,1,Item('foo'))
 		b = (5,2,Item('bar'))
 		c = (1,2,Item('grook'))	
@@ -142,9 +151,11 @@ class TestEstructurasDeDatos(unittest.TestCase):
 		self.assertEqual(minimo,'AAPL')
 		self.assertEqual(maximo,'IBM')
 
+		# Podemos especificar que tome los valores y no la llave
 		minimo = min(lista_precios.values())
 		self.assertEqual(minimo,10.75)
-		# Podemos usar el metodo zip para cambiar las posiciones
+		
+		# O Podemos usar el metodo zip para cambiar las posiciones
 		# y obtener los datos completos para el valor minimo
 		minimo = min(zip(lista_precios.values(),lista_precios.keys()))
 		self.assertEqual(minimo,(10.75,'FB'))
@@ -153,18 +164,24 @@ class TestEstructurasDeDatos(unittest.TestCase):
 		minimo = min(lista_precios, key=lambda k: lista_precios[k])
 		self.assertEqual(minimo,'FB')
 
-	def test_comparar_dos_diccionarios(self):
+	def test_teoria_de_conjuntos_usando_diccionarios(self):
 		a = {'x':1  , 'y':2,  'z':3}
 		b = {'w': 10, 'x': 11, 'y': 2}
 
+		# Union usando llaves
 		self.assertEqual(a.keys() & b.keys(), {'x','y'})
 
+		# left join usando llaves
 		self.assertEqual(a.keys() - b.keys(), {'z'})
 
+		# Union usando llave y Valor
 		self.assertEqual(a.items() & b.items(), {('y',2)})
 
 	def test_eliminar_duplicados(self):
 		a = [1, 5, 2, 1, 9, 1, 5, 10]
+		
+		# set() nos permite crear un conjunto vacio.
+		# Si le pasamos datos eliminara los duplicados.
 		b= set(a)
 		self.assertEqual(b,{1,2,10,5,9})
 
@@ -172,14 +189,13 @@ class TestEstructurasDeDatos(unittest.TestCase):
 		record = '....................100          .......513.25  ..........'
 		cost = int(record[20:32]) * float(record[40:48])
 		self.assertEqual(cost,51325.00)
+		#slice(inicio,fin,saltos) nos permite crear rangos reutilizables
 
 		shares = slice(20,32) # Crea un slice del tipo (20,30, None)
 		price =  slice(40,48)
 		self.assertEqual(int(record[shares]),100)		
 		self.assertEqual(int(record[shares])* float(record[price]),51325)
-		#cost = shares * price
-		#self.assertEqual(cost,1)
-
+		
 	def test_contar_elementos_repetidos_en_una_lista(self):
 		words = [
 			'look', 'into', 'my', 'eyes', 'look', 'into', 'my', 'eyes',
@@ -189,6 +205,8 @@ class TestEstructurasDeDatos(unittest.TestCase):
 		]
 		
 		from collections import Counter
+		
+
 		word_counts = Counter(words)
 		self.assertEqual(word_counts['eyes'],8)
 		
@@ -213,6 +231,16 @@ class TestEstructurasDeDatos(unittest.TestCase):
 		]
 
 		from operator import itemgetter
+
+		llave = itemgetter('uid')
+		mapeo = map(llave, rows)
+		#Obtenemos el listado solo de los valores del uid
+		self.assertEqual(list(mapeo),[1003, 1002, 1001, 1004])
+
+		llave = itemgetter('lname','fname')
+		mapeo = map(llave, rows)
+		self.assertEqual(list(mapeo),[('Jones', 'Brian'), ('Beazley', 'David'), ('Cleese', 'John'), ('Jones', 'Big')])
+
 		rows_by_uid = sorted(rows, key=itemgetter('uid'))
 		self.assertEqual(rows_by_uid[0],{'fname': 'John', 'lname': 'Cleese', 'uid': 1001})
 
@@ -221,7 +249,7 @@ class TestEstructurasDeDatos(unittest.TestCase):
 
 	def test_ordenar_objetos_creados_por_nosotros(self):
 		from operator import attrgetter
-		from DataStructures import User
+		from MisClases import User
 
 
 		users =[User(23), User(3), User(99)]
@@ -289,7 +317,7 @@ class TestEstructurasDeDatos(unittest.TestCase):
 		enteros = list(filter(es_entero,values))
 		self.assertEqual(enteros,['1', '2', '-3', '4', '5'])
 
-		# Es posible realizar operaciones sobre cada numero tambie
+		# Es posible realizar operaciones sobre cada numero tambien
 		import math
 		# Aplicamos la raiz cuadrada a cada numero mayor a cero
 		raiz = [math.sqrt(n) for n in mylist if n > 0]
