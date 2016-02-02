@@ -298,19 +298,10 @@ look into my eyes, you're under."
 		print(mas_corta)
 		self.assertEqual(mas_corta,mas_corta)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+		# si queremos agregarle un espacio al inicio
+		print(textwrap.fill(s, 40, initial_indent=' '))
+		# un espacio despues de la primera linea
+		print(textwrap.fill(s, 40, subsequent_indent=' '))
 
 
 if __name__ == '__main__':
