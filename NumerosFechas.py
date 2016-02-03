@@ -139,5 +139,56 @@ class TestNumeros_y_Fechas(unittest.TestCase):
 		self.assertEqual(diferencia.days,28)
 		self.assertEqual(diferencia.months,2)
 
+	def test_deternimar_un_dia_anterior_a_una_fecha(self):		
+		from datetime import datetime, timedelta
+
+		weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday','Friday', 'Saturday', 'Sunday']
+
+		def get_previous_byday(dayname, start_date=None):
+			if start_date is None:
+				start_date = datetime.today()
+			day_num = start_date.weekday()
+			day_num_target = weekdays.index(dayname)
+			days_ago = (7 + day_num - day_num_target) % 7
+			if days_ago == 0:
+				days_ago = 7
+			target_date = start_date - timedelta(days=days_ago)
+			return target_date
+		anterior = get_previous_byday('Sunday', datetime(2012, 12, 21))
+		self.assertEqual(anterior,datetime(2012, 12, 16, 0, 0))
+
+		# Existe un paquete para este tipo de calculos llamado python-dateutil
+		from datetime import datetime
+		from dateutil.relativedelta import relativedelta
+		from dateutil.rrule import FR
+		fecha_actual = datetime.now()
+		proximo_viernes = (fecha_actual + relativedelta(weekday=FR))
+		anterior_viernes = (fecha_actual + relativedelta(weekday=FR(-1)))
+
+	def test_generar_rango_de_fechas(self):
+		from datetime import datetime,timedelta
+
+		def date_range(start, stop, step):
+			while start < stop:
+				yield start
+				start += step
+		for d in date_range(datetime(2012,9,1),datetime(2012,10,1), timedelta(hours=6)):
+			print(d)
+
+	def test_convertir_cadenas_a_fechas(self):
+		from datetime import datetime
+		text = '2012-09-20'
+		y = datetime.strptime(text, '%Y-%m-%d')
+		self.assertEqual(y,datetime(2012, 9, 20, 0, 0))
+
+		nice_z = datetime.strftime(y, '%A %B %d, %Y')
+		self.assertEqual(nice_z,'Thursday September 20, 2012')
+
+
+
+
+
+
+
 if __name__ == '__main__':
 	unittest.main()
